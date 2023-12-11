@@ -48,9 +48,6 @@ Selector labels
 {{- define "email-service.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "email-service.name" . }}
 app: {{ include "email-service.name" . }}
-tgs.kind: brand
-tgs.brand.kind: gamecredits
-tgs.gamecredits.kind: gamecredits
 {{- end }}
 
 {{/*
