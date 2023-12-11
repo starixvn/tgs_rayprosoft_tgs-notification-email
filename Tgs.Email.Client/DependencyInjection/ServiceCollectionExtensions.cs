@@ -5,7 +5,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddGameProvidersClient(
+    public static IServiceCollection AddEmailClient(
         this IServiceCollection services,
         Action<EmailClientOptions, IServiceProvider> configure)
         =>
