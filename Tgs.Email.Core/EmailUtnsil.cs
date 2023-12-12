@@ -10,9 +10,9 @@ internal class EmailUtnsil(
     IOptions<EmailSettingsOptions> emailConfigAccessor,
     SmtpClient smtpClient) : IEmailUtnsil
 {
-    private readonly EmailSettingsOptions emailSettings = emailConfigAccessor.Value;
+    private readonly EmailSettingsOptions _emailSettings = emailConfigAccessor.Value;
 
-    public async ValueTask PublishHtmlAsync(MailAddressCollection to, MailAddressCollection cc, string subject, string content, CancellationToken cancellationToken = default)
+    public async ValueTask PublishHtmlAsync(MailAddressCollection to, MailAddressCollection cc, MailAddressCollection bcc, string subject, string content, CancellationToken cancellationToken = default)
     {
         if (!to.Any())
         {
@@ -20,7 +20,7 @@ internal class EmailUtnsil(
         }
 
         var message = new MailMessage(
-           from: $"{emailSettings.FromName} <{emailSettings.FromMail}>",
+           from: $"{_emailSettings.FromName} <{_emailSettings.FromMail}>",
            to: string.Join(",", to.Select(x => x.Address)))
         {
             Subject = subject,
@@ -28,38 +28,17 @@ internal class EmailUtnsil(
             BodyEncoding = Encoding.UTF8,
             IsBodyHtml = true,
         };
-        message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(content, Encoding.UTF8, MediaTypeNames.Text.Html));
-        message.CC.Add(string.Join(",", cc.Select(x => x.Address)));
 
-        await smtpClient.SendMailAsync(
-            message,
-            cancellationToken)
-            .ConfigureAwait(false);
-
-        smtpClient.SendCompleted += (_, _) =>
+        if (cc.Any())
         {
-            smtpClient.Dispose();
-            message.Dispose();
-        };
-    }
-
-    public async ValueTask PublishHtmlAsync(MailAddressCollection to, string subject, string content, CancellationToken cancellationToken = default)
-
-    {
-        if (!to.Any())
-        {
-            return;
+            message.CC.Add(string.Join(",", cc.Select(x => x.Address)));
         }
 
-        var message = new MailMessage(
-           from: $"{emailSettings.FromName} <{emailSettings.FromMail}>",
-           to: string.Join(",", to.Select(x => x.Address)))
+        if (bcc.Any())
         {
-            Subject = subject,
-            SubjectEncoding = Encoding.UTF8,
-            BodyEncoding = Encoding.UTF8,
-            IsBodyHtml = true,
-        };
+            message.Bcc.Add(string.Join(",", bcc.Select(x => x.Address)));
+        }
+
         message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(content, Encoding.UTF8, MediaTypeNames.Text.Html));
 
         await smtpClient.SendMailAsync(
@@ -74,7 +53,7 @@ internal class EmailUtnsil(
         };
     }
 
-    public async ValueTask PublishTextAsync(MailAddressCollection to, MailAddressCollection cc, string subject, string content, CancellationToken cancellationToken = default)
+    public async ValueTask PublishTextAsync(MailAddressCollection to, MailAddressCollection cc, MailAddressCollection bcc, string subject, string content, CancellationToken cancellationToken = default)
     {
         if (!to.Any())
         {
@@ -82,44 +61,24 @@ internal class EmailUtnsil(
         }
 
         var message = new MailMessage(
-           from: $"{emailSettings.FromName} <{emailSettings.FromMail}>",
+           from: $"{_emailSettings.FromName} <{_emailSettings.FromMail}>",
            to: string.Join(",", to.Select(x => x.Address)))
         {
             Subject = subject,
             SubjectEncoding = Encoding.UTF8,
             BodyEncoding = Encoding.UTF8,
         };
-        message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(content, Encoding.UTF8, MediaTypeNames.Text.Plain));
-        message.CC.Add(string.Join(",", cc.Select(x => x.Address)));
 
-        await smtpClient.SendMailAsync(
-            message,
-            cancellationToken)
-            .ConfigureAwait(false);
-
-        smtpClient.SendCompleted += (_, _) =>
+        if (cc.Any())
         {
-            smtpClient.Dispose();
-            message.Dispose();
-        };
-    }
-
-    public async ValueTask PublishTextAsync(MailAddressCollection to, string subject, string content, CancellationToken cancellationToken = default)
-
-    {
-        if (!to.Any())
-        {
-            return;
+            message.CC.Add(string.Join(",", cc.Select(x => x.Address)));
         }
 
-        var message = new MailMessage(
-           from: $"{emailSettings.FromName} <{emailSettings.FromMail}>",
-           to: string.Join(",", to.Select(x => x.Address)))
+        if (bcc.Any())
         {
-            Subject = subject,
-            SubjectEncoding = Encoding.UTF8,
-            BodyEncoding = Encoding.UTF8,
-        };
+            message.Bcc.Add(string.Join(",", bcc.Select(x => x.Address)));
+        }
+
         message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(content, Encoding.UTF8, MediaTypeNames.Text.Plain));
 
         await smtpClient.SendMailAsync(

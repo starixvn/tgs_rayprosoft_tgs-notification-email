@@ -2,6 +2,7 @@
 
 public record PublishHtmlCommand(
      IEnumerable<string> Recipients,
-     IEnumerable<string> Copies,
+     IEnumerable<string> CarbonCopies,
+     IEnumerable<string> BlindCarbonCopies,
      string Subject,
      string Content);

@@ -13,25 +13,25 @@ internal class PublishTextCommandService(IEmailUtnsil utnsil) : ICommandService<
             return ValueTask.CompletedTask;
         }
 
-        var to = new MailAddressCollection();
-        command.Recipients.ToList().ForEach(to.Add);
+        var recipients = new MailAddressCollection();
+        command.Recipients.ToList().ForEach(recipients.Add);
 
-        var cc = (MailAddressCollection?)null;
-        if (command.Copies.Any())
+        var carbonCopies = new MailAddressCollection();
+        if (command.CarbonCopies.Any())
         {
-            cc = [];
-            command.Copies.ToList().ForEach(c => cc.Add(c));
+            command.CarbonCopies.ToList().ForEach(carbonCopies.Add);
         }
 
-        return (cc is null)
-            ? utnsil.PublishTextAsync(
-                to: to,
-                subject: command.Subject,
-                content: command.Content,
-                cancellationToken: cancellationToken)
-            : utnsil.PublishTextAsync(
-                to: to,
-                cc: cc,
+        var blindCarbonCopies = new MailAddressCollection();
+        if (command.BlindCarbonCopies.Any())
+        {
+            command.BlindCarbonCopies.ToList().ForEach(blindCarbonCopies.Add);
+        }
+
+        return utnsil.PublishTextAsync(
+                to: recipients,
+                cc: carbonCopies,
+                bcc: blindCarbonCopies,
                 subject: command.Subject,
                 content: command.Content,
                 cancellationToken: cancellationToken);
