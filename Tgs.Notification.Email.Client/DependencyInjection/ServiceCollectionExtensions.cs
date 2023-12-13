@@ -7,16 +7,16 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddNotificationEmailClient(
         this IServiceCollection services,
-        Action<EmailClientOptions, IServiceProvider> configure)
+        Action<NotificationEmailClientOptions, IServiceProvider> configure)
         =>
         services
-        .AddOptions<EmailClientOptions>()
+        .AddOptions<NotificationEmailClientOptions>()
         .Configure(configure)
         .Services
-        .AddHttpClient<IEmailClient, EmailClient>()
+        .AddHttpClient<INotificationEmailClient, NotificationEmailClient>()
         .ConfigureHttpClient((sp, httpClient) =>
         {
-            var options = sp.GetRequiredService<IOptions<EmailClientOptions>>().Value;
+            var options = sp.GetRequiredService<IOptions<NotificationEmailClientOptions>>().Value;
             httpClient.BaseAddress = options.BaseUrl;
         })
         .AddHttpMessageHandler<LoggingHandler>()

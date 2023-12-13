@@ -9,7 +9,7 @@ using Tgs.ServiceUtility;
 
 namespace Tgs.Notification.Email.IntegrationUnitTest;
 
-public class EmailClientUnitTest
+public class NotificationEmailClientUnitTest
 {
     private static readonly string[] _Recipients = ["gordon.hung@rayprosoft.com"];
     private static readonly string[] _CarbonCopies = ["tech@rayprosoft.com"];
@@ -21,7 +21,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -46,7 +46,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishHtmlAsync(
             recipients: _Recipients,
@@ -60,7 +60,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -85,7 +85,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishHtmlAsync(
             recipients: _Recipients,
@@ -100,7 +100,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -125,7 +125,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishHtmlAsync(
             recipients: _Recipients,
@@ -141,7 +141,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -166,7 +166,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishTextAsync(
             recipients: _Recipients,
@@ -180,7 +180,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -205,7 +205,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishTextAsync(
             recipients: _Recipients,
@@ -220,7 +220,7 @@ public class EmailClientUnitTest
         var subject = "testSubject";
         var content = "testContent";
 
-        var web = new TestEmailApplication(builder =>
+        var web = new TestNotificationEmailApplication(builder =>
         {
             _ = builder.ConfigureServices(services =>
             {
@@ -245,7 +245,7 @@ public class EmailClientUnitTest
 
         var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
 
-        var client = new EmailClient(httpClient);
+        var client = new NotificationEmailClient(httpClient);
 
         await client.PublishTextAsync(
             recipients: _Recipients,

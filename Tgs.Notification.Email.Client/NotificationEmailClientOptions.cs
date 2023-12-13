@@ -1,6 +1,6 @@
 ﻿namespace Tgs.Email.Client;
 
-public class EmailClientOptions
+public class NotificationEmailClientOptions
 {
     public Uri BaseUrl { get; set; } = default!;
 }

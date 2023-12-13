@@ -6,7 +6,7 @@ using Tgs.Notification.Email.Common.Models;
 
 namespace Tgs.Email.Client;
 
-internal class EmailClient(HttpClient httpClient) : IEmailClient
+internal class NotificationEmailClient(HttpClient httpClient) : INotificationEmailClient
 {
     private static readonly JsonSerializerOptions _SerializerOptions = new()
     {

@@ -7,7 +7,7 @@ using OpenTelemetry.Exporter;
 
 namespace Tgs.Notification.Email.IntegrationUnitTest;
 
-internal class TestEmailApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
+internal class TestNotificationEmailApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
