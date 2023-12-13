@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-		<Version>0.0.2</Version>
+		<Version>0.0.3</Version>
 		<Authors>Raypro</Authors>
 		<RootNamespace>Tgs.Notification.Email.Client</RootNamespace>
 		<PackageId>Tgs.Notification.Email.Client</PackageId>
@@ -30,7 +30,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Tgs.Notification.Email.Common\Tgs.Notification.Email.Common.csproj" />
+		<ProjectReference Include="..\Tgs.Notification.Email.Common\Tgs.Notification.Email.Common.csproj">
+		  <PrivateAssets>all</PrivateAssets>
+		</ProjectReference>
 	</ItemGroup>
 
 </Project>
