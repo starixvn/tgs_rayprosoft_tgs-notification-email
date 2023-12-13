@@ -4,10 +4,10 @@ include:
     file: GitLab/Templates/gitlab-job-templates.yml
 
 variables:
-  ImageName: pgtgs/email-service
-  TgsSettingKey: email-service
-  HelmTemplateFolderName: email-service
-  BuildCacheKey: Tgs.Email.$CI_PIPELINE_IID
+  ImageName: pgtgs/notification-email
+  TgsSettingKey: notification-email
+  HelmTemplateFolderName: notification-email
+  BuildCacheKey: Tgs.Notification.Email.$CI_PIPELINE_IID
 
 stages:
   - build
@@ -28,15 +28,15 @@ unit-test:
 push-nuget:
   extends: .push-nuget-template
   script:
-    - push_package "Tgs.Email.Client"
+    - push_package "Tgs.Notification.Email.Client"
   artifacts:
     paths:
-      - Tgs.Email.Client/bin/$BuildConfiguration/*.nupkg
+      - Tgs.Notification.Email.Client/bin/$BuildConfiguration/*.nupkg
 
 push-docker-image:
   extends: .push-docker-image-template
   script:
-    - push_docker "Tgs.Email" $ImageName $Tag
+    - push_docker "Tgs.Notification.Email" $ImageName $Tag
 
 push-k8s-template:
   extends: .push-k8s-template
