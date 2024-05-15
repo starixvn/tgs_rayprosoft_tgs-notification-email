@@ -9,21 +9,15 @@ namespace Tgs.Notification.Email.IntegrationUnitTest;
 
 internal class TestNotificationEmailApplication(Action<IWebHostBuilder>? webHostConfigure = null) : WebApplicationFactory<Program>
 {
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
-    {
-        _ = builder
-            .ConfigureAppConfiguration(c => c.Sources.Clear())
-            .ConfigureServices(services =>
-            {
-                _ = services.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
-                    sp => new ConfigureNamedOptions<OtlpExporterOptions>(
-                        Options.DefaultName,
-                        exporterOptions =>
-                        {
-                            exporterOptions.TimeoutMilliseconds = 0;
-                        }));
-            });
+	protected override void ConfigureWebHost(IWebHostBuilder builder)
+	{
+		_ = builder
+			.ConfigureAppConfiguration(c => c.Sources.Clear())
+			.ConfigureServices(services => _ = services.AddSingleton<IConfigureOptions<OtlpExporterOptions>>(
+				sp => new ConfigureNamedOptions<OtlpExporterOptions>(
+					Options.DefaultName,
+					exporterOptions => exporterOptions.TimeoutMilliseconds = 0)));
 
-        webHostConfigure?.Invoke(builder);
-    }
+		webHostConfigure?.Invoke(builder);
+	}
 }

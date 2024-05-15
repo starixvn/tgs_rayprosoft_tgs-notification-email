@@ -11,247 +11,217 @@ namespace Tgs.Notification.Email.IntegrationUnitTest;
 
 public class NotificationEmailClientUnitTest
 {
-    private static readonly string[] _Recipients = ["gordon.hung@rayprosoft.com"];
-    private static readonly string[] _CarbonCopies = ["tech@rayprosoft.com"];
-    private static readonly string[] _BlindCarbonCopies = ["hank.wu@rayprosoft.com"];
+	private static readonly string[] _Recipients = ["gordon.hung@rayprosoft.com"];
+	private static readonly string[] _CarbonCopies = ["tech@rayprosoft.com"];
+	private static readonly string[] _BlindCarbonCopies = ["hank.wu@rayprosoft.com"];
 
-    [Fact]
-    public async Task Publish_Html_Recipients()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+	[Fact]
+	public async Task Publish_Html_Recipients()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
 
-                var command = new PublishHtmlCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: Enumerable.Empty<string>(),
-                    BlindCarbonCopies: Enumerable.Empty<string>(),
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
+				var command = new PublishHtmlCommand(
+					Recipients: _Recipients,
+					CarbonCopies: [],
+					BlindCarbonCopies: [],
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
+		var httpClient = web.CreateDefaultClient();
 
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
+		var client = new NotificationEmailClient(httpClient);
 
-        var client = new NotificationEmailClient(httpClient);
+		await client.PublishHtmlAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content);
+	}
 
-        await client.PublishHtmlAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content);
-    }
+	[Fact]
+	public async Task Publish_Html_CarbonCopies()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-    [Fact]
-    public async Task Publish_Html_CarbonCopies()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
+				var command = new PublishHtmlCommand(
+					Recipients: _Recipients,
+					CarbonCopies: _CarbonCopies,
+					BlindCarbonCopies: [],
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-                var command = new PublishHtmlCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: _CarbonCopies,
-                    BlindCarbonCopies: Enumerable.Empty<string>(),
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
+		var httpClient = web.CreateDefaultClient();
 
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
+		var client = new NotificationEmailClient(httpClient);
 
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
+		await client.PublishHtmlAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content,
+			carbonCopies: _CarbonCopies);
+	}
 
-        var client = new NotificationEmailClient(httpClient);
+	[Fact]
+	public async Task Publish_Html_BlindCarbonCopies()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-        await client.PublishHtmlAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content,
-            carbonCopies: _CarbonCopies);
-    }
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
 
-    [Fact]
-    public async Task Publish_Html_BlindCarbonCopies()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+				var command = new PublishHtmlCommand(
+					Recipients: _Recipients,
+					CarbonCopies: _CarbonCopies,
+					BlindCarbonCopies: _BlindCarbonCopies,
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishHtmlCommand>>();
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-                var command = new PublishHtmlCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: _CarbonCopies,
-                    BlindCarbonCopies: _BlindCarbonCopies,
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
+		var httpClient = web.CreateDefaultClient();
 
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
+		var client = new NotificationEmailClient(httpClient);
 
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
+		await client.PublishHtmlAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content,
+			carbonCopies: _CarbonCopies,
+			blindCarbonCopies: _BlindCarbonCopies);
+	}
 
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
+	[Fact]
+	public async Task Publish_Text_Recipients()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-        var client = new NotificationEmailClient(httpClient);
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
 
-        await client.PublishHtmlAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content,
-            carbonCopies: _CarbonCopies,
-            blindCarbonCopies: _BlindCarbonCopies);
-    }
+				var command = new PublishTextCommand(
+					Recipients: _Recipients,
+					CarbonCopies: [],
+					BlindCarbonCopies: [],
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-    [Fact]
-    public async Task Publish_Text_Recipients()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
+		var httpClient = web.CreateDefaultClient();
 
-                var command = new PublishTextCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: Enumerable.Empty<string>(),
-                    BlindCarbonCopies: Enumerable.Empty<string>(),
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
+		var client = new NotificationEmailClient(httpClient);
 
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
+		await client.PublishTextAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content);
+	}
 
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
+	[Fact]
+	public async Task Publish_Text_CarbonCopies()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
 
-        var client = new NotificationEmailClient(httpClient);
+				var command = new PublishTextCommand(
+					Recipients: _Recipients,
+					CarbonCopies: _CarbonCopies,
+					BlindCarbonCopies: [],
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-        await client.PublishTextAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content);
-    }
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-    [Fact]
-    public async Task Publish_Text_CarbonCopies()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+		var httpClient = web.CreateDefaultClient();
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
+		var client = new NotificationEmailClient(httpClient);
 
-                var command = new PublishTextCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: _CarbonCopies,
-                    BlindCarbonCopies: Enumerable.Empty<string>(),
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
+		await client.PublishTextAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content,
+			carbonCopies: _CarbonCopies);
+	}
 
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
+	[Fact]
+	public async Task Publish_Text_BlindCarbonCopies()
+	{
+		var subject = "testSubject";
+		var content = "testContent";
 
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
+		var web = new TestNotificationEmailApplication(builder => _ = builder.ConfigureServices(services =>
+			{
+				var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
 
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
+				var command = new PublishTextCommand(
+					Recipients: _Recipients,
+					CarbonCopies: _CarbonCopies,
+					BlindCarbonCopies: _BlindCarbonCopies,
+					Subject: subject,
+					Content: content);
+				_ = fakeService
+					.ExecuteAsync(
+					command: Arg.Is(command),
+					cancellationToken: Arg.Any<CancellationToken>());
 
-        var client = new NotificationEmailClient(httpClient);
+				_ = services.AddTransient(_ => fakeService);
+			}));
 
-        await client.PublishTextAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content,
-            carbonCopies: _CarbonCopies);
-    }
+		var httpClient = web.CreateDefaultClient();
 
-    [Fact]
-    public async Task Publish_Text_BlindCarbonCopies()
-    {
-        var subject = "testSubject";
-        var content = "testContent";
+		var client = new NotificationEmailClient(httpClient);
 
-        var web = new TestNotificationEmailApplication(builder =>
-        {
-            _ = builder.ConfigureServices(services =>
-            {
-                var fakeService = Substitute.For<ICommandService<PublishTextCommand>>();
-
-                var command = new PublishTextCommand(
-                    Recipients: _Recipients,
-                    CarbonCopies: _CarbonCopies,
-                    BlindCarbonCopies: _BlindCarbonCopies,
-                    Subject: subject,
-                    Content: content);
-                _ = fakeService
-                    .ExecuteAsync(
-                    command: Arg.Is(command),
-                    cancellationToken: Arg.Any<CancellationToken>());
-
-                _ = services.AddTransient(_ => fakeService);
-            });
-        });
-
-        var fakeLoggingHandler = new LoggingHandler(web.Services.GetRequiredService<ILogger<LoggingHandler>>());
-
-        var httpClient = web.CreateDefaultClient(fakeLoggingHandler);
-
-        var client = new NotificationEmailClient(httpClient);
-
-        await client.PublishTextAsync(
-            recipients: _Recipients,
-            subject: subject,
-            content: content,
-            carbonCopies: _CarbonCopies,
-            blindCarbonCopies: _BlindCarbonCopies);
-    }
+		await client.PublishTextAsync(
+			recipients: _Recipients,
+			subject: subject,
+			content: content,
+			carbonCopies: _CarbonCopies,
+			blindCarbonCopies: _BlindCarbonCopies);
+	}
 }
