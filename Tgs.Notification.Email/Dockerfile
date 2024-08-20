@@ -1,4 +1,4 @@
-﻿﻿FROM hub.lumigame.com/base/dotnet/core/sdk:8.0 AS builder
+﻿FROM hub.lumigame.com/base/dotnet/core/sdk:8.0 AS builder
 
 WORKDIR /src
 COPY ["nuget.config", "."]
