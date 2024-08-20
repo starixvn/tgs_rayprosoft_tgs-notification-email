@@ -1,28 +1,29 @@
-#See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+﻿﻿FROM hub.lumigame.com/base/dotnet/core/sdk:8.0 AS builder
 
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["nuget.config", "."]
 COPY ["Tgs.Notification.Email/Tgs.Notification.Email.csproj", "Tgs.Notification.Email/"]
 COPY ["Tgs.Notification.Email.Common/Tgs.Notification.Email.Common.csproj", "Tgs.Notification.Email.Common/"]
 COPY ["Tgs.Notification.Email.Core/Tgs.Notification.Email.Core.csproj", "Tgs.Notification.Email.Core/"]
-RUN dotnet restore "./Tgs.Notification.Email/./Tgs.Notification.Email.csproj"
+RUN dotnet restore -v n -r linux-x64 "./Tgs.Notification.Email/Tgs.Notification.Email.csproj"
+
 COPY . .
 WORKDIR "/src/Tgs.Notification.Email"
-RUN dotnet build "./Tgs.Notification.Email.csproj" -c $BUILD_CONFIGURATION -o /app/build
+RUN dotnet publish --no-restore -r linux-x64 --self-contained false -o /app
 
-FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Tgs.Notification.Email.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+FROM hub.lumigame.com/base/dotnet/core/aspnet:8.0-alpine-24h1.1 AS base
 
-FROM base AS final
+RUN adduser --disabled-password --gecos '' dotnetuser \
+    && chown -R dotnetuser /tmp
+
+USER dotnetuser
+
 WORKDIR /app
-COPY --from=publish /app/publish .
+
+RUN chown -R dotnetuser /app
+
+COPY --from=builder /app .
+
+ENV ASPNETCORE_URLS=http://+:5000
+
 ENTRYPOINT ["dotnet", "Tgs.Notification.Email.dll"]
