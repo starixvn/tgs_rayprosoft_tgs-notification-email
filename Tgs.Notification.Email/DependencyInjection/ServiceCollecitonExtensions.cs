@@ -27,7 +27,7 @@ public static class ServiceCollecitonExtensions
 				Credentials = new NetworkCredential(
 					emailSettings.FromMail,
 					emailSettings.Password),
-				EnableSsl = true
+				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password)
 			};
 		})
 		.AddNotificationEmailCore();
