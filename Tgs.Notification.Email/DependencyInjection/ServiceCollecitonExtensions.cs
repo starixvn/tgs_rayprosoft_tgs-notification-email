@@ -25,7 +25,7 @@ public static class ServiceCollecitonExtensions
 				Port = emailSettings.Port,
 				UseDefaultCredentials = false,
 				Credentials = new NetworkCredential(
-					emailSettings.FromMail,
+					emailSettings.Username,
 					emailSettings.Password),
 				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password)
 			};
