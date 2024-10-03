@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="TGS.ServiceUtility" Version="0.2.0" />
+	<PackageReference Include="Sentry" Version="4.11.0" />
   </ItemGroup>
 
 </Project>

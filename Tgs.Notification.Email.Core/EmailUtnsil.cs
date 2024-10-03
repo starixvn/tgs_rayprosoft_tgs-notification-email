@@ -1,8 +1,11 @@
 ﻿using System.Net.Mail;
 using System.Net.Mime;
 using System.Text;
+using Sentry;
 
 using Microsoft.Extensions.Options;
+using System.Text.Json;
+using System.Net;
 
 namespace Tgs.Notification.Email.Core;
 
@@ -41,10 +44,39 @@ internal class EmailUtnsil(
 
 		message.AlternateViews.Add(AlternateView.CreateAlternateViewFromString(content, Encoding.UTF8, MediaTypeNames.Text.Html));
 
-		await smtpClient.SendMailAsync(
+
+		var mailMessageJson = JsonSerializer.Serialize(new
+		{
+			From = message.From.ToString(),
+			To = string.Join(", ", message.To.Select(x => x.Address)),
+			CC = string.Join(", ", message.CC.Select(x => x.Address)),
+			BCC = string.Join(", ", message.Bcc.Select(x => x.Address)),
+			Subject = message.Subject,
+			Body = content,
+		});
+
+		var smtpClientJson = JsonSerializer.Serialize(new
+		{
+			Host = smtpClient.Host,
+			Port = smtpClient.Port,
+			EnableSsl = smtpClient.EnableSsl,
+			Credentials = smtpClient.Credentials is NetworkCredential credential
+				? new { credential.UserName, credential.Password }
+				: null
+		});
+
+		try
+		{
+			await smtpClient.SendMailAsync(
 			message,
 			cancellationToken)
 			.ConfigureAwait(false);
+		}
+		catch (Exception ex)
+		{
+			SentrySdk.CaptureException(ex);
+			SentrySdk.CaptureMessage($"EMAIL MESSAGE: {mailMessageJson} SMTP CLIENT: {smtpClientJson}");
+		}
 
 		smtpClient.SendCompleted += (_, _) =>
 		{
@@ -85,6 +117,7 @@ internal class EmailUtnsil(
 			message,
 			cancellationToken)
 			.ConfigureAwait(false);
+		
 
 		smtpClient.SendCompleted += (_, _) =>
 		{

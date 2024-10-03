@@ -12,6 +12,8 @@ var filterInstrumentations = new[] { "html", "ico", "png", "jpg" };
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.UseSentry();
+
 builder.Logging
 	.AddOpenTelemetry(options =>
 	{
@@ -19,9 +21,9 @@ builder.Logging
 		options.ParseStateValues = true;
 		_ = options.AddFluentdForwardExporter(fluentOptions =>
 		{
-			var nodeIp = builder.Configuration.GetValue<string>("NODE_IP")!;
+			var nodeIp = builder.Configuration.GetValue<string>("Otel:NodeIp");
 			fluentOptions.Host = nodeIp;
-			fluentOptions.Tag = builder.Configuration.GetValue<string>("OTEL_SERVICE_NAME")!;
+			fluentOptions.Tag = builder.Configuration.GetValue<string>("Otel:ServiceName")!;
 			fluentOptions.UseMessagePack();
 		});
 	});
@@ -53,7 +55,8 @@ builder.Services.AddNotificationEmail(
 
 builder.Services
 	.AddOpenTelemetry()
-	.WithTracing(builder => builder
+	.ConfigureResource(_ => _.AddService(builder.Configuration.GetValue<string>("Otel:ServiceName")))
+	.WithTracing(tracingBuilder => tracingBuilder
 		.SetResourceBuilder(ResourceBuilder.CreateDefault()
 			.AddEnvironmentVariableDetector())
 		.AddSource("Tgs.*")
@@ -77,7 +80,7 @@ builder.Services
 		.AddEnvironmentVariableDetector())
 		.AddRuntimeInstrumentation()
 		.AddAspNetCoreInstrumentation()
-		.AddOtlpExporter())
+		.AddOtlpExporter(options => options.Endpoint = builder.Configuration.GetValue<Uri>("Otel:Collector")))
 	.Services
 	.AddInterceptionService()
 	.AddServiceUtiltiyInterceptors();
@@ -94,5 +97,7 @@ _ = app.UseAuthorization();
 _ = app.MapControllers();
 
 app.MapHealthChecks("/healthz");
+
+SentrySdk.CaptureMessage($"Started result ReportService at {DateTime.Now.ToString()}");
 
 app.Run();
