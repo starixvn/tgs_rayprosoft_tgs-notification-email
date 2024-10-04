@@ -27,7 +27,7 @@ public class InfoController : ControllerBase
 		var hostIp = Array.Find(hostEntry.AddressList,
 			x => x.AddressFamily == AddressFamily.InterNetwork);
 
-		await TestSendMailDirect(service, emailSettings.Value);
+		await TestSendMailWithProxy2(service, emailSettings.Value);
 		await TestSendMailWithProxy(service, emailSettings.Value);
 
 		return new
@@ -84,6 +84,36 @@ public class InfoController : ControllerBase
 					emailSettings.Username,
 					emailSettings.Password,
 					"lisasqd.nebula.prod:8801"),
+				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
+			};
+
+			await service.ExecuteAsync(
+				command: new PublishTextCommand(
+					Recipients: ["ricky.nguyen@lumiplus.vn"],
+					CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+					BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+			Subject: "Test TestSendMailWithProxy",
+					Content: "Test TestSendMailWithProxy"));
+		}
+		catch (Exception ex)
+		{
+			SentrySdk.CaptureException(ex);
+		}
+	}
+
+	private async Task TestSendMailWithProxy2(ICommandService<PublishTextCommand> service, EmailSettingsOptions emailSettings)
+	{
+		try
+		{
+			var smtpClient = new SmtpClient
+			{
+				Host = "lisasqd.nebula.prod",
+				Port = 8801,
+				UseDefaultCredentials = false,
+				Credentials = new NetworkCredential(
+					emailSettings.Username,
+					emailSettings.Password,
+					"email-smtp.ap-southeast-1.amazonaws.com:2587"),
 				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
 			};
 
