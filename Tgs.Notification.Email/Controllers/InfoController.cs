@@ -44,46 +44,60 @@ public class InfoController : ControllerBase
 
 	private async Task TestSendMailDirect(ICommandService<PublishTextCommand> service, EmailSettingsOptions emailSettings)
 	{
-		var smtpClient = new SmtpClient
+		try
 		{
-			Host = emailSettings.SmtpServer,
-			Port = emailSettings.Port,
-			UseDefaultCredentials = false,
-			Credentials = new NetworkCredential(
-					emailSettings.Username,
-					emailSettings.Password),
-			EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
-		};
+			var smtpClient = new SmtpClient
+			{
+				Host = emailSettings.SmtpServer,
+				Port = emailSettings.Port,
+				UseDefaultCredentials = false,
+				Credentials = new NetworkCredential(
+						emailSettings.Username,
+						emailSettings.Password),
+				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
+			};
 
-		await service.ExecuteAsync(
-			command: new PublishTextCommand(
-				Recipients: ["ricky.nguyen@lumiplus.vn"],
-				CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
-				BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
-		Subject: "Test TestSendMailDirect",
-				Content: "Test TestSendMailDirect"));
+			await service.ExecuteAsync(
+				command: new PublishTextCommand(
+					Recipients: ["ricky.nguyen@lumiplus.vn"],
+					CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+					BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+			Subject: "Test TestSendMailDirect",
+					Content: "Test TestSendMailDirect"));
+		}
+		catch (Exception ex)
+		{
+			SentrySdk.CaptureException(ex);
+		}
 	}
 
 	private async Task TestSendMailWithProxy(ICommandService<PublishTextCommand> service, EmailSettingsOptions emailSettings)
 	{
-		var smtpClient = new SmtpClient
+		try
 		{
-			Host = emailSettings.SmtpServer,
-			Port = emailSettings.Port,
-			UseDefaultCredentials = false,
-			Credentials = new NetworkCredential(
+			var smtpClient = new SmtpClient
+			{
+				Host = emailSettings.SmtpServer,
+				Port = emailSettings.Port,
+				UseDefaultCredentials = false,
+				Credentials = new NetworkCredential(
 					emailSettings.Username,
 					emailSettings.Password,
-					"http://lisasqd.nebula.prod:8801"),
-			EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
-		};
+					"lisasqd.nebula.prod:8801"),
+				EnableSsl = !string.IsNullOrEmpty(emailSettings.Password),
+			};
 
-		await service.ExecuteAsync(
-			command: new PublishTextCommand(
-				Recipients: ["ricky.nguyen@lumiplus.vn"],
-				CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
-				BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
-		Subject: "Test TestSendMailWithProxy",
-				Content: "Test TestSendMailWithProxy"));
+			await service.ExecuteAsync(
+				command: new PublishTextCommand(
+					Recipients: ["ricky.nguyen@lumiplus.vn"],
+					CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+					BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+			Subject: "Test TestSendMailWithProxy",
+					Content: "Test TestSendMailWithProxy"));
+		}
+		catch (Exception ex)
+		{
+			SentrySdk.CaptureException(ex);
+		}
 	}
 }
