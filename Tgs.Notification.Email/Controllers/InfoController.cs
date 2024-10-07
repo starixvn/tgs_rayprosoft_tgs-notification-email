@@ -28,7 +28,7 @@ public class InfoController : ControllerBase
 			x => x.AddressFamily == AddressFamily.InterNetwork);
 
 		await TestSendMailDirect(service, emailSettings.Value);
-		await TestSendMailWithProxy(service, emailSettings.Value);
+		//await TestSendMailWithProxy(service, emailSettings.Value);
 
 		return new
 		{
@@ -57,9 +57,9 @@ public class InfoController : ControllerBase
 
 		await service.ExecuteAsync(
 			command: new PublishTextCommand(
-				Recipients: ["ricky.nguyen@lumiplus.vn"],
-				CarbonCopies: ["ricky.nguyen@lumiplus.vn"],
-				BlindCarbonCopies: ["ricky.nguyen@lumiplus.vn"],
+				Recipients: ["ricky.nguyen@sabawork.com"],
+				CarbonCopies: ["ricky.nguyen@sabawork.com"],
+				BlindCarbonCopies: ["ricky.nguyen@sabawork.com"],
 		Subject: "Test TestSendMailDirect",
 				Content: "Test TestSendMailDirect"));
 	}
