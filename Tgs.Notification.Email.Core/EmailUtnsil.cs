@@ -74,8 +74,10 @@ internal class EmailUtnsil(
 		}
 		catch (Exception ex)
 		{
-			SentrySdk.CaptureException(ex);
-			SentrySdk.CaptureMessage($"EMAIL MESSAGE: {mailMessageJson} SMTP CLIENT: {smtpClientJson}");
+			var formattedMessage = $"EXCEPTION MESSAGE:\n{ex}\n\n" +
+						   $"EMAIL MESSAGE:\n{mailMessageJson}\n\n" +
+						   $"SMTP CLIENT:\n{smtpClientJson}";
+			SentrySdk.CaptureException(new Exception(formattedMessage));
 		}
 
 		smtpClient.SendCompleted += (_, _) =>

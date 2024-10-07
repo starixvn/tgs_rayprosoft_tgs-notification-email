@@ -28,14 +28,6 @@ internal class PublishHtmlCommandService(IEmailUtnsil utnsil) : ICommandService<
 			command.BlindCarbonCopies.ToList().ForEach(blindCarbonCopies.Add);
 		}
 
-		SentrySdk.CaptureMessage(
-			$"PublishHtmlCommand executed: Recipients: {string.Join(", ", command.Recipients)}, " +
-			$"CC: {string.Join(", ", command.CarbonCopies)}, " +
-			$"BCC: {string.Join(", ", command.BlindCarbonCopies)}, " +
-			$"Subject: {command.Subject}, " +
-			$"Content: {command.Content.Substring(0, Math.Min(command.Content.Length, 100))}..." 
-		);
-
 		return utnsil.PublishHtmlAsync(
 				to: recipients,
 				cc: carbonCopies,
